@@ -730,6 +730,11 @@ section { scroll-margin-top: calc(var(--nav-h) + 24px); }
 .crit-desc {
   color: var(--mid);
 }
+/* Desktop: no rule above the first offering; it aligns with the kicker */
+@media (min-width: 901px) {
+  .engage .crit-list { border-top: none; }
+  .engage .crit-item:first-child { padding-top: 0; }
+}
 
 .cta {
   display: inline-flex;
