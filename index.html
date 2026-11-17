@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.png">
+<title>[Staging] Andrew Galu · Presentation Design Functions</title>
+<meta name="description" content="Andrew Galu is a founding presentation designer. Advisory and consulting on presentation design teams, systems, and talent. Okta, OpenAI, Sierra. Bay Area.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F1F1EF;
+  --ink: #0A0A0A;
+  --mid: #585852;
+  --faint: #8A8A82;
+  --rule: #D8D8D2;
+  --white: #FFFFFF;
+  /* Inter Tight (narrower UI sans) + Instrument Serif display */
+  --font: 'Inter Tight', system-ui, sans-serif;
+  --font-display: 'Instrument Serif', Georgia, serif;
+  /* Type scale · few sizes, big jumps (+20% site scale) */
+  --t-ui: 13px;
+  --t-body: 19px;
+  --t-lead: 24px;
+  --t-hed: 38px;
+  --t-mark: 67px;
+  --pad: 58px;
+  --drawer-pad: 43px;
+  --max: 1152px;
+  --nav-h: 62px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  font-size: 19px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+body {
+  overflow-x: hidden;
+}
+html.drawer-open,
+html.drawer-open body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+html.drawer-open .drawer-body {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  min-height: 100vh;
+  line-height: 1.5;
+  overflow-x: clip;
+}
+
+::selection {
+  background: rgba(10,10,10,0.12);
+  color: inherit;
+}
+
+a { color: inherit; }
+
+/* ─── NAV ─────────────────────── */
+.gnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  border-bottom: 1px solid transparent; /* reserved · no layout shift on scroll */
+  background: rgba(241,241,239,0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  z-index: 200;
+  transition: border-color 180ms ease;
+}
+.gnav.scrolled { border-bottom-color: var(--rule); }
+
+/* Same max + pad as page .wrap · sacred content left edge */
+.gnav-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--pad);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+}
+
+.gnav-mark {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-decoration: none;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 1;
+  min-width: 0;
+  border-radius: 4px;
+}
+.gnav-mark:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.gnav-tabs {
+  display: flex;
+  gap: 4px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-shrink: 0;
+}
+
+.gtab {
+  background: none;
+  border: none;
+  font-family: var(--font);
+  font-size: var(--t-ui);
+  font-weight: 400;
+  color: var(--mid);
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 999px;
+  letter-spacing: 0.01em;
+  transition: color 160ms ease, background 160ms ease;
+  text-decoration: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.gtab:hover { color: var(--ink); }
+.gtab.active {
+  color: var(--ink);
+  font-weight: 500;
+  background: rgba(10,10,10,0.06);
+}
+.gtab:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.gnav-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.gnav-link {
+  font-size: var(--t-ui);
+  font-weight: 400;
+  color: var(--mid);
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  transition: color 160ms ease;
+  flex-shrink: 0;
+  border-radius: 4px;
+}
+.gnav-link:hover { color: var(--ink); }
+.gnav-link:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* ─── LAYOUT ──────────────────── */
+.wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--pad);
+  overflow: visible;
+}
+
+/* Sacred rule: primary text sits at wrap content-box left (no extra indent) */
+.wrap .name,
+.wrap .statement-hed,
+.wrap .section-label,
+.wrap .engage-hed,
+.wrap .engage-sub,
+.wrap .engage-kicker,
+.wrap .engage-title,
+.wrap .engage-copy,
+.wrap .crit-list,
+.wrap .cta,
+.wrap .site-footer,
+.wrap .co,
+.wrap .hero-for,
+.wrap .samples-ticker,
+.wrap .work-also {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+section { scroll-margin-top: calc(var(--nav-h) + 24px); }
+
+/* ─── HERO ────────────────────── */
+.hero {
+  padding: 160px 0 0;
+}
+
+.hero-role {
+  font-size: var(--t-ui);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 32px;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: clamp(53px, 6vw, var(--t-mark));
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+
+.hero-for {
+  margin-top: 28px;
+  font-size: var(--t-body);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--mid);
+  max-width: 38em;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0;
+  row-gap: 12px;
+  margin-top: 80px;
+  padding: 24px 0 32px; /* bottom padding on strip, not per-item */
+  border-top: 1px solid var(--rule);
+}
+
+.hero-meta-item {
+  font-size: var(--t-ui);
+  font-weight: 400;
+  color: var(--mid);
+  letter-spacing: 0.01em;
+  padding-right: 28px;
+  margin-right: 28px;
+  border-right: 1px solid var(--rule);
+  white-space: nowrap;
+  line-height: 1.4;
+}
+.hero-meta-item:last-child {
+  border-right: none;
+  margin-right: 0;
+  padding-right: 0;
+}
+.hero-meta-item strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* ─── STATEMENT ───────────────── */
+.statement {
+  padding: 96px 0 112px;
+  /* bottom hairline owned by .samples-ticker */
+  border-bottom: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 64px;
+  align-items: start;
+}
+
+.statement-hed {
+  font-family: var(--font-display);
+  font-size: clamp(37px, 4.37vw, 50px);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  max-width: 18em;
+}
+
+.statement-body {
+  font-size: var(--t-body);
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--mid);
+  max-width: 34em;
+  padding-top: 8px;
+}
+
+/* ─── WORK SAMPLES TICKER ─────── */
+.samples-ticker {
+  /* Top rule only; bottom rule moved to .work (Selected Work title) */
+  padding: 20px 0 64px;
+  border-top: 1px solid var(--rule);
+  border-bottom: none;
+}
+
+.samples-ticker-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.samples-ticker-label {
+  font-size: var(--t-ui);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0;
+}
+
+.ticker-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.ticker-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  background: var(--white);
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: background 140ms ease, color 140ms ease, opacity 140ms ease;
+}
+.ticker-nav-btn:hover {
+  background: var(--ink);
+  color: #fff;
+}
+.ticker-nav-btn:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 2px;
+}
+.ticker-nav-btn:disabled {
+  opacity: 0.28;
+  cursor: default;
+  background: transparent;
+  color: var(--ink);
+}
+
+.ticker-track {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.ticker-track::-webkit-scrollbar { display: none; height: 0; }
+
+.ticker-thumb {
+  flex: 0 0 auto;
+  width: 231px;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  background: transparent;
+  overflow: hidden;
+  scroll-snap-align: start;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.ticker-thumb:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 2px;
+}
+.ticker-thumb img,
+.ticker-thumb svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ─── WORK INDEX ──────────────── */
+.work {
+  /* vertical only · horizontal pad comes from .wrap (do not shorthand-overwrite) */
+  /* Hairline lives on .section-label so width matches Selected Frames rule */
+  border-top: none;
+  padding-top: 0;
+  /* Match .statement padding-bottom (space above Selected Frames rule) */
+  padding-bottom: 112px;
+}
+
+.section-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  /* Same content-box width as .samples-ticker top rule */
+  border-top: 1px solid var(--rule);
+  padding-top: 20px;
+}
+
+.section-label h2 {
+  font-size: var(--t-ui);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.section-label .count {
+  font-size: var(--t-ui);
+  font-weight: 400;
+  color: var(--faint);
+}
+
+.work-list {
+  border-top: none;
+  list-style: none;
+  overflow: visible;
+}
+.work-list > li {
+  list-style: none;
+  overflow: visible;
+  position: relative;
+}
+
+/* Rigid work grid · idx | mono | company | role | years | arrow (no category) */
+.work-list,
+.work-list > li,
+.work-row {
+  padding-left: 0;
+  padding-right: 0;
+}
+.work-row {
+  display: grid;
+  grid-template-columns: 28px 28px minmax(0, 1.35fr) minmax(0, 1.7fr) 88px 20px;
+  column-gap: 12px;
+  row-gap: 0;
+  align-items: center;
+  padding: 24px 0;
+  margin: 0;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  border-radius: 0;
+  cursor: pointer;
+  background: transparent;
+  text-align: left;
+  font-family: var(--font);
+  color: inherit;
+  position: relative;
+  overflow: visible;
+  appearance: none;
+  -webkit-appearance: none;
+}
+/* Hover wash · negative into pad; text stays put */
+.work-row::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: 0; bottom: 0;
+  left: calc(var(--pad) * -1);
+  right: calc(var(--pad) * -0.25);
+  background: transparent;
+  pointer-events: none;
+  transition: background 160ms ease;
+}
+.work-row:hover::before,
+.work-row:focus-visible::before {
+  background: rgba(255,255,255,0.55);
+}
+.work-row:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: -1px;
+}
+.work-row > * { position: relative; z-index: 1; }
+
+.work-row .idx {
+  font-size: var(--t-ui);
+  line-height: 1.3;
+  color: var(--faint);
+  font-weight: 400;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+}
+
+.work-row .mono {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: #fff;
+  flex-shrink: 0;
+  padding: 0;
+  padding-top: 1px;
+  justify-self: start;
+}
+
+.work-row .co {
+  font-size: var(--t-body);
+  line-height: 1.3;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.work-row .role {
+  font-size: var(--t-ui);
+  line-height: 1.3;
+  font-weight: 400;
+  color: var(--mid);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  padding: 0;
+}
+
+.work-row .years {
+  font-size: var(--t-ui);
+  line-height: 1.3;
+  font-weight: 400;
+  color: var(--faint);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  padding: 0;
+}
+
+.work-row .arr {
+  font-size: var(--t-ui);
+  line-height: 1.3;
+  color: var(--faint);
+  text-align: right;
+  transition: color 160ms ease, transform 180ms var(--ease);
+}
+.work-row:hover .arr,
+.work-row:focus-visible .arr {
+  color: var(--ink);
+  transform: translate(2px, -2px);
+}
+
+.work-also {
+  margin-top: 28px;
+  font-size: var(--t-ui);
+  color: var(--mid);
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+}
+.work-also strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* ─── ENGAGE ──────────────────── */
+.engage {
+  /* vertical only · keep .wrap horizontal pad */
+  /* Top gap owned by .work padding-bottom (matches statement→Frames) */
+  padding-top: 0;
+  padding-bottom: 128px;
+}
+
+.engage-intro {
+  /* Rule above title · same 20px as Selected Work .section-label */
+  /* A bit more space from title down to the offering */
+  padding: 20px 0 48px;
+  border-top: 1px solid var(--rule);
+}
+
+.engage-hed {
+  font-family: var(--font-display);
+  font-size: clamp(37px, 4.37vw, 50px);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 0;
+  max-width: 12em;
+}
+.engage-hed em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--mid);
+}
+
+.engage-sub {
+  font-size: var(--t-body);
+  color: var(--mid);
+  line-height: 1.7;
+  max-width: 36em;
+}
+
+.engage-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  border: none;
+  border-top: none;
+  background: transparent;
+  margin: 0;
+  width: auto;
+  max-width: none;
+}
+
+.engage-col {
+  padding: 0 0 56px;
+  margin: 0;
+}
+.engage-col + .engage-col {
+  border-left: none;
+}
+
+.engage-kicker {
+  font-size: var(--t-ui);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.engage-title {
+  font-size: var(--t-lead);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  margin-bottom: 28px;
+  max-width: 16em;
+}
+
+.engage-copy {
+  font-size: var(--t-body);
+  color: var(--mid);
+  line-height: 1.7;
+  margin-bottom: 16px;
+  max-width: 32em;
+}
+.engage-copy:last-of-type { margin-bottom: 32px; }
+
+.crit-list {
+  list-style: none;
+  border-top: 1px solid var(--rule);
+  margin-bottom: 40px;
+}
+
+.crit-item {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 8px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--t-body);
+  line-height: 1.6;
+  color: var(--mid);
+}
+.crit-item .n {
+  font-size: var(--t-ui);
+  color: var(--faint);
+  padding-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.crit-title {
+  font-size: var(--t-body);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.4;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.crit-desc {
+  color: var(--mid);
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font);
+  font-size: var(--t-ui);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--ink);
+  padding: 12px 0 4px;
+  min-height: 44px;
+  cursor: pointer;
+  transition: color 160ms ease, border-color 160ms ease;
+  border-radius: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.cta:hover { color: var(--mid); border-color: var(--mid); }
+.cta:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 4px;
+}
+
+/* ─── FOOTER ──────────────────── */
+.site-footer {
+  border-top: 1px solid var(--rule);
+  padding-top: 32px;
+  padding-bottom: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+}
+
+.site-footer a,
+.site-footer span {
+  font-size: var(--t-ui);
+  color: var(--mid);
+  text-decoration: none;
+  letter-spacing: 0.01em;
+}
+.site-footer a:hover { color: var(--ink); }
+.site-footer a:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* ─── DRAWER ──────────────────── */
+.overlay {
+  visibility: hidden;
+  opacity: 0;
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,10,0.42);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 400;
+  pointer-events: none;
+  transition: opacity 220ms ease, visibility 0s linear 220ms;
+}
+.overlay.open {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 220ms ease, visibility 0s linear 0s;
+}
+
+.drawer {
+  position: fixed;
+  top: 0; right: 0;
+  width: min(572px, 100vw);
+  height: 100%;
+  height: 100dvh;
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateX(100%);
+  transition: transform 240ms var(--ease);
+  z-index: 500;
+}
+.overlay.open .drawer { transform: translateX(0); }
+
+.drawer-band {
+  height: 2px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.drawer-hero {
+  width: 100%;
+  height: 234px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #111;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.drawer-hero img,
+.drawer-hero svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.drawer-hero:empty { display: none; }
+
+.drawer-head {
+  padding: 28px var(--drawer-pad) 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.drawer-title-row {
+  min-width: 0;
+  flex: 1;
+}
+
+.drawer-company {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3vw, 30px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: #fff;
+  min-width: 0;
+}
+
+.drawer-close {
+  background: none;
+  border: none;
+  font-family: var(--font);
+  font-size: var(--t-ui);
+  font-weight: 400;
+  color: rgba(255,255,255,0.35);
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 8px;
+  margin: -8px -8px 0 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+  transition: color 150ms ease;
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 4px;
+}
+.drawer-close:hover { color: #fff; }
+.drawer-close:focus-visible {
+  outline: 1px solid rgba(255,255,255,0.85);
+  outline-offset: 2px;
+  color: #fff;
+}
+
+.drawer-sub {
+  padding: 16px var(--drawer-pad) 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.drawer-role {
+  font-size: var(--t-ui);
+  color: rgba(255,255,255,0.48);
+  letter-spacing: 0.01em;
+}
+
+.drawer-years {
+  font-size: var(--t-ui);
+  color: rgba(255,255,255,0.28);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px var(--drawer-pad) 64px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+
+.drawer-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 32px;
+}
+.drawer-gallery:empty { display: none; margin: 0; }
+.drawer-gallery-item {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 2px;
+  background: #111;
+}
+.drawer-gallery-item img,
+.drawer-gallery-item svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.drawer-body::-webkit-scrollbar {
+  width: 5px;
+}
+.drawer-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.drawer-body::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+}
+.drawer-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+.drawer-impact {
+  font-size: var(--t-body);
+  line-height: 1.7;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 40px;
+}
+
+.drawer-testimonial {
+  margin-bottom: 40px;
+}
+.drawer-testimonial[hidden],
+.drawer-testimonial.is-empty {
+  display: none;
+  margin: 0;
+  padding: 0;
+}
+
+.drawer-quote {
+  font-family: var(--font-display);
+  font-size: var(--t-lead);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+.drawer-attrib {
+  font-size: var(--t-ui);
+  color: rgba(255,255,255,0.32);
+  letter-spacing: 0.02em;
+  border-left: 1px solid rgba(255,255,255,0.14);
+  padding-left: 16px;
+  line-height: 1.5;
+}
+
+.drawer-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.drawer-tag {
+  font-size: var(--t-ui);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.38);
+}
+
+/* ─── RESPONSIVE ──────────────── */
+/* Collapse centered tabs before they collide with mark/email (~700–900) */
+@media (max-width: 900px) {
+  :root { --pad: 29px; --drawer-pad: 34px; }
+  .gnav-inner { gap: 8px; min-width: 0; }
+  .gnav-tabs {
+    position: static;
+    transform: none;
+    min-width: 0;
+  }
+  .gtab {
+    padding: 10px 14px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .gnav-right .gnav-link:not(.gnav-linkedin) { display: none; }
+  .gnav-mark { max-width: none; }
+  .hero { padding-top: 120px; }
+  .hero-meta { margin-top: 64px; }
+  .statement {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 72px 0 88px;
+  }
+  .ticker-thumb {
+    width: 193px;
+    min-width: 193px;
+    aspect-ratio: 16 / 9;
+    height: auto;
+  }
+  .drawer {
+    width: min(572px, 100vw);
+    max-width: 100%;
+  }
+  .drawer-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* already 2-col; thumbs scale with wider drawer */
+  .work-row {
+    grid-template-columns: 28px 28px minmax(0, 1fr) 72px 20px;
+    column-gap: 12px;
+  }
+  .work-row .role { display: none; }
+  .engage-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .engage-col { padding: 0 0 40px; }
+  .engage-copy:last-of-type { margin-bottom: 0; }
+}
+
+@media (max-width: 520px) {
+  :root { --pad: 24px; --drawer-pad: 29px; --t-mark: 58px; }
+  .gnav-mark { display: none; }
+  .gnav-inner { justify-content: center; }
+  .gnav-right { display: none; }
+  .hero-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 24px;
+    padding: 24px 0 24px;
+  }
+  .hero-meta-item {
+    border-right: none;
+    margin-right: 0;
+    padding-right: 0;
+    white-space: normal;
+  }
+  .work-row {
+    grid-template-columns: 24px 24px minmax(0, 1fr) 64px 18px;
+    column-gap: 10px;
+  }
+  .work-row .co { font-size: 14px; }
+  .drawer-gallery { grid-template-columns: 1fr; }
+  .drawer { width: min(100vw, 572px); max-width: 100%; }
+  .ticker-thumb { width: 168px; min-width: 168px; aspect-ratio: 16 / 9; height: auto; }
+  .site-footer { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<!-- OVERLAY + DRAWER -->
+<div class="overlay" id="overlay" onclick="handleOverlayClick(event)">
+  <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="d-name" onclick="event.stopPropagation()">
+    <div class="drawer-band" id="d-band"></div>
+    <div class="drawer-hero" id="d-hero" aria-hidden="true"></div>
+    <div class="drawer-head">
+      <div class="drawer-title-row">
+        <div class="drawer-company" id="d-name"></div>
+      </div>
+      <button class="drawer-close" type="button" onclick="closeDrawer()" aria-label="Close">ESC ✕</button>
+    </div>
+    <div class="drawer-sub">
+      <span class="drawer-role" id="d-role"></span>
+      <span class="drawer-years" id="d-years"></span>
+    </div>
+    <div class="drawer-body">
+      <p class="drawer-impact" id="d-impact"></p>
+      <div class="drawer-gallery" id="d-gallery"></div>
+      <div class="drawer-testimonial" id="d-testimonial">
+        <div class="drawer-quote" id="d-quote"></div>
+        <div class="drawer-attrib" id="d-attrib"></div>
+      </div>
+      <div class="drawer-tags" id="d-tags"></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="gnav" id="gnav">
+  <div class="gnav-inner">
+    <a class="gnav-mark" href="#overview">Andrew Galu</a>
+    <div class="gnav-tabs">
+      <a class="gtab active" href="#overview" data-section="overview">Overview</a>
+      <a class="gtab" href="#work" data-section="work">Work</a>
+      <a class="gtab" href="#engage" data-section="engage">Engage</a>
+    </div>
+    <div class="gnav-right">
+      <a class="gnav-link gnav-linkedin" href="https://www.linkedin.com/in/andrew-galu-b79b6033" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="gnav-link" href="mailto:andrew@galudesign.com">andrew@galudesign.com</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <!-- OVERVIEW / HERO -->
+  <section class="wrap" id="overview">
+    <div class="hero">
+      <p class="hero-role">Founding presentation designer</p>
+      <h1 class="name">Andrew Galu</h1>
+      <p class="hero-for">For brand, creative, and comms leaders building or scaling their presentation function.</p>
+      <div class="hero-meta">
+        <div class="hero-meta-item"><strong>3</strong> functions founded</div>
+        <div class="hero-meta-item"><strong>100+</strong> exec keynotes</div>
+        <div class="hero-meta-item">Okta · OpenAI · Sierra</div>
+        <div class="hero-meta-item">Bay Area</div>
+      </div>
+    </div>
+
+    <div class="statement">
+      <h2 class="statement-hed">Presentation design is more than production. It's communication infrastructure with a bad title.</h2>
+      <p class="statement-body">I work with brand and creative leadership when the company has outgrown DIY decks and ad-hoc freelancers. What changes is ownership: templates, standards, intake, and guardrails that make sure your brand scales properly.</p>
+    </div>
+
+    <div class="samples-ticker" aria-label="Work samples">
+      <div class="samples-ticker-head">
+        <p class="samples-ticker-label">Selected frames</p>
+        <div class="ticker-nav" role="group" aria-label="Scroll selected frames">
+          <button type="button" class="ticker-nav-btn" id="ticker-prev" aria-label="Previous frames">‹</button>
+          <button type="button" class="ticker-nav-btn" id="ticker-next" aria-label="Next frames">›</button>
+        </div>
+      </div>
+      <div class="ticker-track" id="ticker-track"></div>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section class="wrap work" id="work">
+    <div class="section-label">
+      <h2>Selected Work</h2>
+    </div>
+    <ul class="work-list" id="work-list"></ul>
+    <p class="work-also"><strong>Also:</strong> Paradigm: presentation advisory and executive keynote support. ADPList: mentoring presentation designers and design leaders.</p>
+  </section>
+
+  <!-- ENGAGE · Advisory & Consulting
+       Previous Consulting + Full-time version: _archive/sections/engage-consulting-fulltime.html -->
+  <section class="wrap engage" id="engage" aria-labelledby="engage-hed">
+    <div class="engage-intro">
+      <h2 class="engage-hed" id="engage-hed">Engage <em>with me</em></h2>
+    </div>
+
+    <div class="engage-grid">
+      <div class="engage-col">
+        <p class="engage-kicker">Advisory &amp; Consulting</p>
+        <h3 class="engage-title">Helping teams build better presentation design capabilities.</h3>
+        <p class="engage-copy">I work with creative leaders and organizations to strengthen the people, processes, and systems behind exceptional presentation design.</p>
+      </div>
+
+      <div class="engage-col">
+        <ol class="crit-list" aria-label="Advisory offerings">
+          <li class="crit-item"><span class="n" aria-hidden="true">01</span><div><h4 class="crit-title">Creative guidance</h4><p class="crit-desc">Expert perspective on presentation design standards, visual quality, creative direction, and best practices.</p></div></li>
+          <li class="crit-item"><span class="n" aria-hidden="true">02</span><div><h4 class="crit-title">Team &amp; systems</h4><p class="crit-desc">Building and improving presentation design teams, workflows, tools, and scalable design systems.</p></div></li>
+          <li class="crit-item"><span class="n" aria-hidden="true">03</span><div><h4 class="crit-title">Talent advisory</h4><p class="crit-desc">Identifying, evaluating, and connecting organizations with exceptional presentation design talent.</p></div></li>
+        </ol>
+
+        <a class="cta" id="get-in-touch" href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1QPL7Ls3JfJIjYietEE072ffw5oWlyEeR8yyA5mD2QQttjdPtLAf-LVg7AT2-X7_9Ka2p0SIR7" target="_blank" rel="noopener">Get in touch<span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap site-footer">
+  <div class="site-footer-links">
+    <a href="mailto:andrew@galudesign.com">andrew@galudesign.com</a>
+    <a href="https://www.linkedin.com/in/andrew-galu-b79b6033" target="_blank" rel="noopener">LinkedIn</a>
+  </div>
+  <span>Bay Area, California</span>
+</footer>
+
+<script>
+const ORDER = ['sierra','openai','okta','datarobot','appdynamics','meta','duarte'];
+
+const DATA = {
+  sierra: {
+    color: '#002E1E',
+    name: 'Sierra',
+    mono: 'S',
+    role: 'Strategic partner · Presentation infrastructure',
+    years: '2025 – 26',
+    yearsShort: '2025–26',
+    impact: 'Early-stage brand team needed presentation infrastructure before scale locked in bad habits. Owned system foundation, brand alignment, and executive keynote support. After: efficiencies for the brand team and a higher bar for how the company shows up.',
+    quote: 'Partnering with Andrew is one of the best decisions our brand team has made. He has created massive efficiencies while simultaneously upleveling our brand.',
+    attrib: 'Ally Witherspoon Johnston · Product and Brand Marketing Lead, Sierra',
+    samples: [
+      { label: '01', caption: 'Slide library', src: 'portfolio-samples/sierra/01-slide-library.jpg' },
+      { label: '02', caption: 'Agents keynote', src: 'portfolio-samples/sierra/02-agents-keynote.jpg' }
+    ],
+    tags: ['Early-stage system', 'Brand alignment', 'Executive keynote', 'Team independence']
+  },
+  openai: {
+    color: '#080808',
+    name: 'OpenAI',
+    mono: 'O',
+    role: 'Founded presentation design',
+    years: '2024 – 2025',
+    yearsShort: '2024–25',
+    impact: 'Hypergrowth with no owned presentation design function under intense public visibility. Founded the function: templates, standards, production workflows, and narrative framework for All Hands, executive keynotes, and investor communications. After: a scalable bar company-wide; contributed to ChatGPT Agents presentation design (July 2025).',
+    quote: 'Andrew came in as a founding member of the presentation design team and quickly set the bar. He built systems that scaled, and elevated communications company-wide.',
+    attrib: 'Veit Moeller · Head of Design, Brand & Comms, OpenAI',
+    samples: [
+      { label: '01', caption: 'Leadership Q&A', src: 'portfolio-samples/openai/01-leadership-qa.gif' },
+      { label: '02', caption: 'GPT-4o Spring Update', src: 'portfolio-samples/openai/02-gpt-4o-spring.jpg' },
+      { label: '03', caption: 'o1 / DevDay stage', src: 'portfolio-samples/openai/03-o1-devday.jpg' },
+      { label: '04', caption: 'March 2025 Board Meeting', src: 'portfolio-samples/openai/04-board-meeting.jpg' }
+    ],
+    tags: ['Function build', 'Executive keynotes', 'Template system', 'All Hands', 'Narrative framework']
+  },
+  okta: {
+    color: '#003D99',
+    name: 'Okta',
+    mono: 'Ok',
+    role: 'Creative lead · Founding designer',
+    years: '2022 – 2024',
+    yearsShort: '2022–24',
+    impact: 'Entered as a team of one during a major rebrand with fragmented presentation practice. Owned rebuild of the presentation system, production standards, vendor relationships, and event seasons. After: a governed path from GTM decks to main stage.',
+    quote: 'Andrew operates at a level where oversight is irrelevant. He delivers more than what is asked and thinks deeply about how work scales, building trust with everyone around him.',
+    attrib: 'Hubert Shum · Group Creative Director, Okta',
+    samples: [
+      { label: '01', caption: 'Main-stage keynote', src: 'portfolio-samples/okta/01-keynote-stage.jpg' },
+      { label: '02', caption: 'SKO FY24 environment', src: 'portfolio-samples/okta/02-sko-fy24.jpg' },
+      { label: '03', caption: "Today’s keynotes board", src: 'portfolio-samples/okta/03-todays-keynotes.jpg' }
+    ],
+    tags: ['Rebrand integration', 'Template system', 'Event production', 'Vendor governance']
+  },
+  datarobot: {
+    color: '#8C2E00',
+    name: 'DataRobot',
+    mono: 'DR',
+    role: 'GTM Creative Director',
+    years: '2020 – 2022',
+    yearsShort: '2020–22',
+    impact: 'GTM and event creative lacked a single directing hand across enablement and live moments. Owned multidisciplinary creative direction, visual systems, and sales onboarding materials. After: consistent storytelling across the sales organization.',
+    quote: '',
+    attrib: '',
+    samples: [
+      { label: '01', caption: 'The AI Market', src: 'portfolio-samples/datarobot/01-ai-market.jpg' },
+      { label: '02', caption: 'Chelsea event install', src: 'portfolio-samples/datarobot/02-chelsea-event.jpg' },
+      { label: '03', caption: 'Speed & Scale', src: 'portfolio-samples/datarobot/03-speed-scale.jpg' }
+    ],
+    tags: ['GTM creative', 'Sales enablement', 'Event production', 'Team leadership']
+  },
+  appdynamics: {
+    color: '#2A0D66',
+    name: 'AppDynamics',
+    mono: 'AD',
+    role: 'Creative Manager',
+    years: '2019 – 2020',
+    yearsShort: '2019–20',
+    impact: 'Sales presentations and internal storytelling needed cross-functional creative ownership. Led the creative team on enablement and GTM event content. After: stronger sales support; promoted from Creative Specialist within one year.',
+    quote: '',
+    attrib: '',
+    samples: [
+      { label: '01', caption: 'Enablement decks' },
+      { label: '02', caption: 'GTM event content' }
+    ],
+    tags: ['Sales enablement', 'GTM content', 'Team leadership']
+  },
+  meta: {
+    color: '#0552CC',
+    name: 'Meta',
+    mono: 'M',
+    role: 'Communications design · Art direction',
+    years: '2016 – 2018',
+    yearsShort: '2016–18',
+    impact: 'Facebook for Business needed communications design at production scale inside creative services. Owned art direction and template work that shifted the function from reactive execution toward strategic communication design. After: clearer brand templates and production systems for business storytelling.',
+    quote: '',
+    attrib: '',
+    samples: [
+      { label: '01', caption: 'Messenger 800M', src: 'portfolio-samples/meta/01-messenger-800m.jpg' },
+      { label: '02', caption: 'Engineers support', src: 'portfolio-samples/meta/02-engineers-balloon.jpg' }
+    ],
+    tags: ['Enterprise scale', 'Brand templates', 'Production systems', 'Comms design']
+  },
+  duarte: {
+    color: '#141414',
+    name: 'Duarte Design',
+    mono: 'D',
+    role: 'Senior Designer',
+    years: '2013 – 2015',
+    yearsShort: '2013–15',
+    impact: 'Client presentation work at a specialized narrative design studio. Owned craft, story structure, and slide systems for high-stakes decks. After: the foundation for every function-build role that followed.',
+    quote: '',
+    attrib: '',
+    samples: [
+      { label: '01', caption: 'Cycle of Poverty', src: 'portfolio-samples/duarte/01-cycle-of-poverty.jpg' },
+      { label: '02', caption: 'The Analysis Process', src: 'portfolio-samples/duarte/02-analysis-process.jpg' },
+      { label: '03', caption: 'Peers are ROLE MODELS', src: 'portfolio-samples/duarte/03-peers-role-models.jpg' },
+      { label: '04', caption: 'THEN / NOW', src: 'portfolio-samples/duarte/04-then-now.jpg' }
+    ],
+    tags: ['Narrative design', 'Presentation craft', 'Story structure']
+  }
+};
+
+function pad(n) {
+  return String(n).padStart(2, '0');
+}
+
+function escapeXml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/** Generated sample visual · brand color + grid + label (no CDN). */
+function sampleSvg(color, label, caption, w, h) {
+  const c = color || '#222';
+  const lab = escapeXml(label || '');
+  const cap = escapeXml(caption || '');
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
+    `<rect width="${w}" height="${h}" fill="${c}"/>` +
+    `<g stroke="rgba(255,255,255,0.08)" stroke-width="1">` +
+    Array.from({ length: Math.floor(w / 16) }, (_, i) =>
+      `<line x1="${(i + 1) * 16}" y1="0" x2="${(i + 1) * 16}" y2="${h}"/>`
+    ).join('') +
+    Array.from({ length: Math.floor(h / 16) }, (_, i) =>
+      `<line x1="0" y1="${(i + 1) * 16}" x2="${w}" y2="${(i + 1) * 16}"/>`
+    ).join('') +
+    `</g>` +
+    `<rect x="12" y="12" width="36" height="20" rx="2" fill="rgba(255,255,255,0.12)"/>` +
+    `<text x="30" y="26" text-anchor="middle" fill="rgba(255,255,255,0.85)" ` +
+    `font-family="system-ui,sans-serif" font-size="11" font-weight="600">${lab}</text>` +
+    `<text x="12" y="${h - 16}" fill="rgba(255,255,255,0.55)" ` +
+    `font-family="system-ui,sans-serif" font-size="11">${cap}</text>` +
+    `</svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+function sampleImg(d, sample, w, h, alt, opts) {
+  const src = sample.src
+    ? sample.src
+    : sampleSvg(d.color, sample.label, sample.caption, w, h);
+  const dims = sample.src
+    ? ` style="width:100%;height:100%;object-fit:cover;"`
+    : ` width="${w}" height="${h}"`;
+  /* GIFs load eagerly so they can animate once in view; other samples stay lazy. */
+  const isGif = !!(sample.src && /\.gif(?:[?#]|$)/i.test(sample.src));
+  const loading = (opts && opts.eager) || isGif ? 'eager' : 'lazy';
+  return `<img src="${src}" alt="${escapeXml(alt || sample.caption)}"${dims} loading="${loading}" decoding="async">`;
+}
+
+/* Frames-only extras (not in client drawers) */
+const TICKER_EXTRA = [
+  {
+    name: 'Paradigm',
+    color: '#0A0A0A',
+    caption: 'Portfolio support',
+    src: 'portfolio-samples/paradigm/02-portfolio-support.jpg'
+  },
+  {
+    name: 'Paradigm',
+    color: '#0A0A0A',
+    caption: 'Bridging the Gap',
+    src: 'portfolio-samples/paradigm/03-bridging-the-gap.jpg'
+  }
+];
+/* Insert Paradigm Frames after OpenAI / before Okta */
+const TICKER_EXTRA_AFTER = 'openai';
+
+/* Paths excluded from Selected Frames only (still show in drawers). */
+const TICKER_EXCLUDE = new Set([
+  'portfolio-samples/duarte/02-analysis-process.jpg',
+  'portfolio-samples/paradigm/01-crypto-is-money.jpg'
+]);
+
+function renderTicker() {
+  const track = document.getElementById('ticker-track');
+  if (!track) return;
+  const items = [];
+  /* Real stills only; skip GIFs in the strip (OpenAI Leadership Q&A stays in the drawer). */
+  ORDER.forEach(id => {
+    const d = DATA[id];
+    const photos = (d.samples || [])
+      .filter(s => s.src && !/\.gif(?:[?#]|$)/i.test(s.src) && !TICKER_EXCLUDE.has(s.src))
+      .slice(0, 2);
+    photos.forEach((s) => items.push({ kind: 'client', id, d, s }));
+    if (id === TICKER_EXTRA_AFTER) {
+      TICKER_EXTRA.forEach((ex) => items.push({ kind: 'extra', ex }));
+    }
+  });
+
+  track.innerHTML = items.map((item) => {
+    if (item.kind === 'extra') {
+      const ex = item.ex;
+      const fake = { color: ex.color, src: ex.src, caption: ex.caption };
+      return (
+        `<button type="button" class="ticker-thumb" ` +
+        `aria-label="${escapeXml(ex.name)} · ${escapeXml(ex.caption)}">` +
+        sampleImg(fake, fake, 256, 160, `${ex.name} ${ex.caption}`) +
+        `</button>`
+      );
+    }
+    const { id, d, s } = item;
+    return (
+      `<button type="button" class="ticker-thumb" onclick="openDrawer('${id}')" ` +
+      `aria-label="${escapeXml(d.name)} · ${escapeXml(s.caption)}">` +
+      sampleImg(d, s, 256, 160, `${d.name} ${s.caption}`) +
+      `</button>`
+    );
+  }).join('');
+
+  syncTickerNav();
+}
+
+function syncTickerNav() {
+  const track = document.getElementById('ticker-track');
+  const prev = document.getElementById('ticker-prev');
+  const next = document.getElementById('ticker-next');
+  if (!track || !prev || !next) return;
+  const max = Math.max(0, track.scrollWidth - track.clientWidth);
+  prev.disabled = track.scrollLeft <= 2;
+  next.disabled = track.scrollLeft >= max - 2;
+}
+
+function scrollTicker(dir) {
+  const track = document.getElementById('ticker-track');
+  if (!track) return;
+  const step = Math.max(260, Math.floor(track.clientWidth * 0.85));
+  track.scrollBy({ left: dir * step, behavior: 'smooth' });
+}
+
+function renderWork() {
+  const list = document.getElementById('work-list');
+  if (!list) return;
+  list.innerHTML = ORDER.map((id, i) => {
+    const d = DATA[id];
+    return `<li>
+      <button type="button" class="work-row" onclick="openDrawer('${id}')" aria-label="Open ${escapeXml(d.name)}">
+        <span class="idx">${pad(i + 1)}</span>
+        <span class="mono" style="background:${d.color}">${escapeXml(d.mono)}</span>
+        <span class="co">${escapeXml(d.name)}</span>
+        <span class="role">${escapeXml(d.role)}</span>
+        <span class="years">${escapeXml(d.yearsShort)}</span>
+        <span class="arr" aria-hidden="true">↗</span>
+      </button>
+    </li>`;
+  }).join('');
+}
+
+function openDrawer(id) {
+  const d = DATA[id];
+  if (!d) return;
+  document.getElementById('d-band').style.background = d.color;
+  document.getElementById('d-name').textContent = d.name;
+  document.getElementById('d-role').textContent = d.role;
+  document.getElementById('d-years').textContent = d.years;
+  document.getElementById('d-impact').textContent = d.impact;
+
+  const hero = document.getElementById('d-hero');
+  const samples = d.samples || [];
+  if (samples.length) {
+    hero.innerHTML = sampleImg(d, samples[0], 880, 360, `${d.name} · ${samples[0].caption}`, { eager: true });
+  } else {
+    hero.innerHTML = '';
+  }
+
+  const gal = document.getElementById('d-gallery');
+  gal.innerHTML = samples.map(s =>
+    `<div class="drawer-gallery-item">` +
+    sampleImg(d, s, 400, 300, `${d.name} · ${s.caption}`) +
+    `</div>`
+  ).join('');
+
+  const tw = document.getElementById('d-testimonial');
+  if (d.quote) {
+    document.getElementById('d-quote').textContent = '“' + d.quote + '”';
+    document.getElementById('d-attrib').textContent = d.attrib;
+    tw.style.display = 'block';
+    tw.classList.remove('is-empty');
+  } else {
+    document.getElementById('d-quote').textContent = '';
+    document.getElementById('d-attrib').textContent = '';
+    tw.style.display = 'none';
+    tw.classList.add('is-empty');
+  }
+  document.getElementById('d-tags').innerHTML = (d.tags || []).map(t =>
+    `<span class="drawer-tag">${escapeXml(t)}</span>`
+  ).join('');
+  const body = document.querySelector('.drawer-body');
+  if (body) body.scrollTop = 0;
+  const drawer = document.getElementById('drawer');
+  if (drawer) drawer.scrollTop = 0;
+  currentDrawerId = id;
+  document.getElementById('overlay').classList.add('open');
+  lockPageScroll();
+}
+
+let currentDrawerId = null;
+let scrollLockY = 0;
+
+function lockPageScroll() {
+  scrollLockY = window.scrollY || window.pageYOffset || 0;
+  document.documentElement.classList.add('drawer-open');
+  document.body.classList.add('drawer-open');
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${scrollLockY}px`;
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.style.width = '100%';
+  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
+}
+
+function unlockPageScroll() {
+  document.documentElement.classList.remove('drawer-open');
+  document.body.classList.remove('drawer-open');
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  document.body.style.width = '';
+  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
+  window.scrollTo(0, scrollLockY);
+}
+
+function closeDrawer() {
+  const overlay = document.getElementById('overlay');
+  if (overlay) overlay.classList.remove('open');
+  currentDrawerId = null;
+  unlockPageScroll();
+  /* Drop focus so focus-visible wash doesn't stick on the work row */
+  const ae = document.activeElement;
+  if (ae && typeof ae.blur === 'function') ae.blur();
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('overlay')) closeDrawer();
+}
+
+document.addEventListener('keydown', e => {
+  const overlay = document.getElementById('overlay');
+  const open = overlay && overlay.classList.contains('open');
+  if (!open) return;
+  if (e.key === 'Escape') {
+    closeDrawer();
+  }
+});
+
+/* Nav scroll state + spy */
+const gnav = document.getElementById('gnav');
+const sections = ['overview', 'work', 'engage'].map(id => document.getElementById(id));
+const tabs = [...document.querySelectorAll('.gtab')];
+
+function setActiveTab(id) {
+  tabs.forEach(t => t.classList.toggle('active', t.dataset.section === id));
+}
+
+function onScroll() {
+  if (gnav) gnav.classList.toggle('scrolled', window.scrollY > 8);
+  const y = window.scrollY + 80;
+  let current = 'overview';
+  for (const s of sections) {
+    if (s && s.offsetTop <= y) current = s.id;
+  }
+  setActiveTab(current);
+}
+
+tabs.forEach(t => {
+  t.addEventListener('click', () => {
+    const id = t.dataset.section;
+    if (id) setActiveTab(id);
+  });
+});
+
+window.addEventListener('hashchange', () => {
+  const id = (location.hash || '#overview').slice(1);
+  if (['overview', 'work', 'engage'].includes(id)) setActiveTab(id);
+});
+
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+if (location.hash) {
+  const id = location.hash.slice(1);
+  if (['overview', 'work', 'engage'].includes(id)) setActiveTab(id);
+}
+
+renderWork();
+renderTicker();
+
+(function () {
+
+  const track = document.getElementById('ticker-track');
+  const prev = document.getElementById('ticker-prev');
+  const next = document.getElementById('ticker-next');
+  if (prev) prev.addEventListener('click', () => scrollTicker(-1));
+  if (next) next.addEventListener('click', () => scrollTicker(1));
+  if (track) {
+    track.addEventListener('scroll', syncTickerNav, { passive: true });
+    window.addEventListener('resize', syncTickerNav);
+  }
+})();
+
+
+</script>
+</body>
+</html>
