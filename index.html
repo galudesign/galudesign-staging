@@ -763,6 +763,10 @@ section { scroll-margin-top: calc(var(--nav-h) + 24px); }
   outline: 1px solid var(--ink);
   outline-offset: 4px;
 }
+.cta.is-copied {
+  color: var(--mid);
+  border-bottom-color: var(--mid);
+}
 
 /* ─── FOOTER ──────────────────── */
 .site-footer {
@@ -1217,7 +1221,7 @@ section { scroll-margin-top: calc(var(--nav-h) + 24px); }
           <li class="crit-item"><span class="n" aria-hidden="true">03</span><div><h4 class="crit-title">Talent advisory</h4><p class="crit-desc">Identifying, evaluating, and connecting organizations with exceptional presentation design talent.</p></div></li>
         </ol>
 
-        <a class="cta" id="get-in-touch" href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1QPL7Ls3JfJIjYietEE072ffw5oWlyEeR8yyA5mD2QQttjdPtLAf-LVg7AT2-X7_9Ka2p0SIR7" target="_blank" rel="noopener">Get in touch<span aria-hidden="true">↗</span></a>
+        <button type="button" class="cta" id="copy-email" data-email="andrew@galudesign.com">Get in touch<span aria-hidden="true">↗</span></button>
       </div>
     </div>
   </section>
@@ -1654,6 +1658,30 @@ renderTicker();
   if (track) {
     track.addEventListener('scroll', syncTickerNav, { passive: true });
     window.addEventListener('resize', syncTickerNav);
+  }
+
+  const copyBtn = document.getElementById('copy-email');
+  if (copyBtn) {
+    const email = copyBtn.getAttribute('data-email') || 'andrew@galudesign.com';
+    const label = copyBtn.innerHTML;
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(email);
+      } catch (err) {
+        const ta = document.createElement('textarea');
+        ta.value = email;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      copyBtn.classList.add('is-copied');
+      copyBtn.innerHTML = 'Email address copied<span aria-hidden="true">↗</span>';
+      window.setTimeout(() => {
+        copyBtn.classList.remove('is-copied');
+        copyBtn.innerHTML = label;
+      }, 1800);
+    });
   }
 })();
 
